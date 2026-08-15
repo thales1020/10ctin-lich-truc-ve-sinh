@@ -102,6 +102,8 @@ body {
 
 h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
 
+[hidden] { display: none !important; }
+
 .page {
   max-width: 900px;
   margin: 0 auto;
