@@ -1,5 +1,5 @@
 // Điền URL Web App của Apps Script sau khi deploy (xem README.md).
-const API_URL = 'DÁN_APPS_SCRIPT_WEB_APP_URL_VÀO_ĐÂY';
+const API_URL = 'https://script.google.com/macros/s/AKfycbzlKzbDG05Gm4GYjKaKUyPlklSdslhwcBLg_M77vQo3tzzWPKiJJytZ260jn522KrRd/exec';
 
 const DAY_LABELS = { Mon: 'Thứ 2', Tue: 'Thứ 3', Wed: 'Thứ 4', Thu: 'Thứ 5', Fri: 'Thứ 6' };
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
