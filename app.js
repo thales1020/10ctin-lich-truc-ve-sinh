@@ -7,10 +7,34 @@ const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 const statusEl = document.getElementById('status');
 const currentEl = document.getElementById('week-current');
 const nextEl = document.getElementById('week-next');
+const todayHeroEl = document.getElementById('today-hero');
 const modalOverlay = document.getElementById('modal-overlay');
 const modalContent = document.getElementById('modal-content');
 const lightbox = document.getElementById('lightbox');
 const lightboxImg = document.getElementById('lightbox-img');
+const themeToggle = document.getElementById('theme-toggle');
+const themeToggleIcon = document.getElementById('theme-toggle-icon');
+
+function initTheme() {
+  const saved = localStorage.getItem('theme');
+  if (saved === 'light' || saved === 'dark') {
+    document.documentElement.setAttribute('data-theme', saved);
+  }
+  updateThemeIcon();
+}
+function updateThemeIcon() {
+  const current = document.documentElement.getAttribute('data-theme');
+  const isDark = current === 'dark' || (!current && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  themeToggleIcon.textContent = isDark ? '☀️' : '🌙';
+}
+themeToggle.addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme');
+  const isDark = current === 'dark' || (!current && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  const next = isDark ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  updateThemeIcon();
+});
 
 function showStatus(msg, type) {
   statusEl.hidden = false;
@@ -81,12 +105,21 @@ function renderWeekBlock(container, week, opts) {
   container.innerHTML = '';
   container.className = `week-block ${week.status}`;
 
+  const head = document.createElement('div');
+  head.className = 'week-head';
   const h2 = document.createElement('h2');
   h2.textContent = opts.title;
+  const tag = document.createElement('span');
+  tag.className = 'week-tag';
+  tag.textContent = week.status === 'open' ? 'Đang mở đăng ký' : 'Đã chốt';
+  head.appendChild(h2);
+  head.appendChild(tag);
+
   const range = document.createElement('p');
   range.className = 'week-range';
-  range.textContent = fmtRange(week.weekStart) + (week.status === 'open' ? ' · đang mở đăng ký' : ' · đã chốt');
-  container.appendChild(h2);
+  range.textContent = fmtRange(week.weekStart);
+
+  container.appendChild(head);
   container.appendChild(range);
 
   const grid = document.createElement('div');
@@ -99,7 +132,8 @@ function renderWeekBlock(container, week, opts) {
   DAYS.forEach((d) => {
     const info = week.days[d];
     const card = document.createElement('div');
-    card.className = 'day-card' + (info.to ? '' : ' empty');
+    card.className = 'day-card' + (info.to ? ' filled' : ' empty');
+    if (info.to) card.style.setProperty('--to-color', `var(--to-${info.to})`);
 
     const label = document.createElement('div');
     label.className = 'day-label';
@@ -110,8 +144,7 @@ function renderWeekBlock(container, week, opts) {
       card.appendChild(toBadge(info.to));
     } else {
       const muted = document.createElement('div');
-      muted.style.color = '#9aa1b2';
-      muted.style.fontSize = '0.85rem';
+      muted.className = 'empty-note';
       muted.textContent = 'Chưa có tổ trực';
       card.appendChild(muted);
     }
@@ -163,6 +196,50 @@ function renderWeekBlock(container, week, opts) {
   container.appendChild(grid);
 }
 
+function renderTodayHero(weekCurrent) {
+  todayHeroEl.innerHTML = '';
+  const jsDay = new Date().getDay(); // 0 = CN, 1 = T2, ... 6 = T7
+  const dayKey = { 1: 'Mon', 2: 'Tue', 3: 'Wed', 4: 'Thu', 5: 'Fri' }[jsDay];
+
+  const eyebrow = document.createElement('span');
+  eyebrow.className = 'eyebrow';
+  eyebrow.textContent = 'Hôm nay · ' + new Date().toLocaleDateString('vi-VN', { weekday: 'long', day: '2-digit', month: '2-digit' });
+
+  const headline = document.createElement('div');
+  headline.className = 'headline';
+
+  const textWrap = document.createElement('div');
+  textWrap.appendChild(eyebrow);
+  textWrap.appendChild(headline);
+  todayHeroEl.appendChild(textWrap);
+
+  if (!dayKey) {
+    todayHeroEl.classList.add('is-empty');
+    headline.textContent = 'Cuối tuần — không có lịch trực';
+    return;
+  }
+
+  const info = weekCurrent.days[dayKey];
+  if (!info.to) {
+    todayHeroEl.classList.add('is-empty');
+    headline.textContent = 'Hôm nay chưa có tổ trực';
+    return;
+  }
+
+  todayHeroEl.classList.remove('is-empty');
+  todayHeroEl.style.setProperty('--to-current', `var(--to-${info.to})`);
+  headline.innerHTML = `Tổ <span class="to-name">${info.to}</span> trực vệ sinh hôm nay`;
+
+  if (info.photoUrl) {
+    const img = document.createElement('img');
+    img.className = 'today-thumb';
+    img.src = info.photoUrl;
+    img.alt = 'Ảnh trực vệ sinh hôm nay';
+    img.addEventListener('click', () => openLightbox(info.photoUrl));
+    todayHeroEl.appendChild(img);
+  }
+}
+
 function openRegisterModal(week, day, registeredTo) {
   modalContent.innerHTML = '';
   const h3 = document.createElement('h3');
@@ -170,8 +247,7 @@ function openRegisterModal(week, day, registeredTo) {
   modalContent.appendChild(h3);
 
   const p = document.createElement('p');
-  p.style.color = '#6b7280';
-  p.style.fontSize = '0.85rem';
+  p.className = 'hint';
   p.textContent = 'Chọn tổ của bạn:';
   modalContent.appendChild(p);
 
@@ -313,6 +389,7 @@ async function load() {
     if (!data.ok) throw new Error(data.error || 'Lỗi không xác định');
     hideStatus();
     const [weekCurrent, weekNext] = data.weeks;
+    renderTodayHero(weekCurrent);
     renderWeekBlock(currentEl, weekCurrent, { title: 'Tuần này' });
     renderWeekBlock(nextEl, weekNext, { title: 'Tuần sau' });
   } catch (err) {
@@ -320,6 +397,7 @@ async function load() {
   }
 }
 
+initTheme();
 updateCountdown();
 setInterval(updateCountdown, 60 * 1000);
 load();
