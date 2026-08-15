@@ -68,17 +68,29 @@ function ensureWeekRow_(sheet, weekStr) {
   return sheet.getLastRow();
 }
 
+// Một tuần chỉ thực sự "mở đăng ký" nếu tuần đó CHƯA bắt đầu (Thứ 2 của tuần
+// đó còn ở tương lai so với hôm nay). Tính theo ngày thực tế thay vì chỉ dựa
+// vào cột Status đã lưu, để tuần hiện tại luôn tự động bị khoá đúng hạn dù
+// trigger assignRandomSlots (chạy mỗi Thứ Hai) có được thiết lập hay chưa.
+function weekIsOpen_(weekStr) {
+  var weekMonday = new Date(weekStr + 'T00:00:00');
+  var todayMonday = mondayOf_(new Date());
+  return weekMonday > todayMonday;
+}
+
 function rowToWeekObject_(sheet, row) {
   var values = sheet.getRange(row, 1, 1, HEADER.length).getValues()[0];
   var obj = { row: row, weekStart: '', status: 'open', days: {} };
+  var storedStatus = 'open';
   HEADER.forEach(function (h, i) {
     if (h === 'WeekStart') {
       var v = values[i];
       obj.weekStart = v instanceof Date ? fmtDate_(v) : String(v);
     } else if (h === 'Status') {
-      obj.status = values[i] || 'open';
+      storedStatus = values[i] || 'open';
     }
   });
+  obj.status = (storedStatus === 'locked' || !weekIsOpen_(obj.weekStart)) ? 'locked' : 'open';
   DAYS.forEach(function (d) {
     obj.days[d] = {
       label: DAY_LABELS[d],
@@ -220,8 +232,12 @@ function assignRandomSlots() {
   var today = mondayOf_(new Date());
   var lastRow = sheet.getLastRow();
   for (var row = 2; row <= lastRow; row++) {
+    // Đọc Status GỐC trong Sheet (chưa qua weekIsOpen_) — rowToWeekObject_ trả về
+    // trạng thái "hiệu lực" (đã tự khoá theo hạn), nên ở đây cần giá trị thô để
+    // biết tuần nào CHƯA được xử lý (random-fill + khoá) lần nào.
+    var rawStatus = sheet.getRange(row, colIndex_('Status')).getValue() || 'open';
+    if (rawStatus !== 'open') continue;
     var week = rowToWeekObject_(sheet, row);
-    if (week.status !== 'open') continue;
     var weekMonday = new Date(week.weekStart + 'T00:00:00');
     if (weekMonday > today) continue; // tuần này vẫn còn ở tương lai, chưa tới hạn
 
