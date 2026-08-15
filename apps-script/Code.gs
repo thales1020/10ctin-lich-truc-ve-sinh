@@ -4,8 +4,8 @@
  */
 
 // ==== CẤU HÌNH — điền các giá trị này sau khi tạo Sheet + Drive folder ====
-var SHEET_ID = 'DÁN_SHEET_ID_VÀO_ĐÂY';
-var FOLDER_ID = 'DÁN_DRIVE_FOLDER_ID_VÀO_ĐÂY';
+var SHEET_ID = '12z181dHJEYHHJLNaw1VCIQ3-tIHc_JrkDSxL6F-JGE4';
+var FOLDER_ID = '1OFhMvtyhVrQ2IMi4SBwvIL-30penYTUv';
 var SHEET_NAME = 'Schedule';
 var NUM_TO = 5; // số tổ trong lớp
 var DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
