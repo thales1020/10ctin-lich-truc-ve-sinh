@@ -14,6 +14,7 @@ const lightbox = document.getElementById('lightbox');
 const lightboxImg = document.getElementById('lightbox-img');
 const themeToggle = document.getElementById('theme-toggle');
 const themeToggleIcon = document.getElementById('theme-toggle-icon');
+const themeToggleLabel = document.getElementById('theme-toggle-label');
 
 function initTheme() {
   const saved = localStorage.getItem('theme');
@@ -26,6 +27,7 @@ function updateThemeIcon() {
   const current = document.documentElement.getAttribute('data-theme');
   const isDark = current === 'dark' || (!current && window.matchMedia('(prefers-color-scheme: dark)').matches);
   themeToggleIcon.textContent = isDark ? '☀️' : '🌙';
+  themeToggleLabel.textContent = isDark ? 'Chế độ sáng' : 'Chế độ tối';
 }
 themeToggle.addEventListener('click', () => {
   const current = document.documentElement.getAttribute('data-theme');
