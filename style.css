@@ -105,13 +105,9 @@ h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
 [hidden] { display: none !important; }
 
 .page {
-  max-width: 1240px;
+  max-width: 1440px;
   margin: 0 auto;
-  padding: 0 28px 56px;
-}
-
-@media (max-width: 520px) {
-  .page { padding: 0 16px 56px; }
+  padding: 0 clamp(16px, 4vw, 56px) 56px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -121,7 +117,7 @@ h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
 /* ===== Banner ===== */
 
 .banner {
-  padding: 22px 0 18px;
+  padding: clamp(20px, 3vw, 32px) 0 18px;
 }
 
 .banner-inner {
@@ -129,6 +125,7 @@ h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .brand {
@@ -138,12 +135,12 @@ h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
 }
 
 .brand-mark {
-  font-size: 2rem;
+  font-size: clamp(1.8rem, 1.4rem + 1.2vw, 2.6rem);
   line-height: 1;
 }
 
 .brand-text h1 {
-  font-size: 1.5rem;
+  font-size: clamp(1.4rem, 1.1rem + 1vw, 2rem);
   font-weight: 700;
   color: var(--ink);
 }
@@ -151,7 +148,7 @@ h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
 .subtitle {
   margin: 2px 0 0;
   color: var(--ink-muted);
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 500;
 }
 
@@ -200,7 +197,7 @@ h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
-  padding: 24px 28px;
+  padding: clamp(20px, 2.4vw, 30px) clamp(20px, 3vw, 32px);
   margin-bottom: 22px;
   display: flex;
   align-items: center;
@@ -221,7 +218,7 @@ h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
 
 .today-hero .headline {
   font-family: var(--font-display);
-  font-size: 1.5rem;
+  font-size: clamp(1.25rem, 1rem + 1vw, 1.9rem);
   font-weight: 700;
 }
 
@@ -258,7 +255,7 @@ h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
-  padding: 24px 28px;
+  padding: clamp(18px, 2.4vw, 30px) clamp(18px, 3vw, 32px);
   margin-bottom: 20px;
 }
 
@@ -272,7 +269,7 @@ h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
 }
 
 .week-block h2 {
-  font-size: 1.05rem;
+  font-size: clamp(1.05rem, 0.95rem + 0.4vw, 1.25rem);
   font-weight: 700;
 }
 
@@ -296,12 +293,8 @@ h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
 
 .day-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 14px;
-}
-
-@media (max-width: 700px) {
-  .day-grid { grid-template-columns: 1fr; }
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: clamp(10px, 1.4vw, 16px);
 }
 
 .day-card {
@@ -309,11 +302,11 @@ h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
   border-top: 3px solid var(--line-strong);
   border-radius: var(--radius-md);
   background: var(--surface);
-  padding: 12px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  min-height: 148px;
+  min-height: 150px;
 }
 
 .day-card.filled { border-top-color: var(--to-color, var(--accent)); border-top-style: solid; }
