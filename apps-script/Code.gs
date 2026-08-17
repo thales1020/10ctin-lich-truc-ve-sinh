@@ -278,3 +278,13 @@ function shuffle_(arr) {
   }
   return arr;
 }
+
+// Chạy hàm này 1 LẦN thủ công trong Apps Script Editor (nút Run, chọn function
+// này ở dropdown) để trigger màn hình xin quyền truy cập Google Drive — các
+// hàm khác như assignRandomSlots không đụng tới DriveApp nên không xin quyền
+// này giúp bạn được. Sau khi chạy thành công (xem log), nhớ Deploy -> Manage
+// deployments -> New version thì Web App mới có quyền đó.
+function testDriveAccess() {
+  var folder = DriveApp.getFolderById(FOLDER_ID);
+  Logger.log('OK, truy cập được folder: ' + folder.getName());
+}
